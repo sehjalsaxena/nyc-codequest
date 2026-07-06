@@ -7,11 +7,19 @@ const btn = document.querySelector('#lightBtn');
 const body = document.querySelector("body");
 
 btn.addEventListener("click", () => {
-    if(body.classList.toggle('darkMode')){
-        btn.textContent = "🌙";
-    }else{
-        btn.textContent = "☀️";
-    }
+    if (btn) {
+    btn.textContent = body.classList.contains("darkMode") ? "☀️" : "🌙";
+
+    btn.addEventListener("click", () => {
+        body.classList.toggle("darkMode");
+
+        const isDark = body.classList.contains("darkMode");
+
+        btn.textContent = isDark ? "☀️" : "🌙";
+
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+    })
+}
 })
 
 // ---------- Login ----------
@@ -33,7 +41,7 @@ loginForm.addEventListener("submit", (e) => {
         .then(async (userCredential) => {
             // Returning users skip the questionnaire entirely — check
             // Firestore before deciding where to send them.
-            let completed = false;
+            let completed = true;
 
             try {
                 const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
