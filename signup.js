@@ -7,12 +7,22 @@ const btn = document.querySelector('#lightBtn');
 const body = document.querySelector("body");
 
 btn.addEventListener("click", () => {
-    if(body.classList.toggle('darkMode')){
-        btn.textContent = "🌙";
-    }else{
-        btn.textContent = "☀️";
-    }
+    if (btn) {
+    btn.textContent = body.classList.contains("darkMode") ? "☀️" : "🌙";
+
+    btn.addEventListener("click", () => {
+        body.classList.toggle("darkMode");
+
+        const isDark = body.classList.contains("darkMode");
+
+        btn.textContent = isDark ? "☀️" : "🌙";
+
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+    });
+}
 })
+
+
 
 // ---------- Sign up ----------
 const signupForm = document.querySelector("#signupForm");
