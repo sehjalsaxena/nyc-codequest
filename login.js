@@ -33,7 +33,7 @@ loginForm.addEventListener("submit", (e) => {
         .then(async (userCredential) => {
             // Returning users skip the questionnaire entirely — check
             // Firestore before deciding where to send them.
-            let completed = false;
+            let completed = true;
 
             try {
                 const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
