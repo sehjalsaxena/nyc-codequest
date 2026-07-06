@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SIFT | Stop Searching. Start Learning.</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="script.js" defer></script>
+    <script type="module" src="js/dashboard.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link rel="shortcut icon" href="images/logo.png" type="image/x-icon">
+
+    <!-- Page-specific styles only. Reuses color/spacing/type tokens
+         already defined in style.css so this page stays in lockstep
+         with the rest of the site. -->
+    <style>
+
+        /* ---------------------------------------------------------
+           Shared button classes (same pattern as other pages)
+           --------------------------------------------------------- */
+        .btn-primary {
+            border: 1px solid var(--ink);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--ink);
+            color: var(--bg);
+            padding: 11px 20px;
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: var(--accent-ink);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--line);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            background-color: transparent;
+            color: var(--ink);
+            padding: 11px 20px;
+            cursor: pointer;
+            transition: border-color 0.12s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--ink);
+        }
+
+        /* ---------------------------------------------------------
+           Dashboard shell — two column on desktop, stacked on mobile
+           --------------------------------------------------------- */
+        .dashboard-shell {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 40px 96px;
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* ---------------------------------------------------------
+           Sidebar
+           --------------------------------------------------------- */
+        .sidebar {
+            position: sticky;
+            top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 12px;
+            background: var(--bg);
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius);
+            font-family: 'Inter', sans-serif;
+            font-size: 14.5px;
+            font-weight: 500;
+            color: var(--ink-soft);
+            transition: background-color 0.12s ease, color 0.12s ease;
+        }
+
+        .sidebar a i {
+            font-size: 18px;
+            width: 18px;
+        }
+
+        .sidebar a:hover {
+            background: var(--surface);
+            color: var(--ink);
+        }
+
+        .sidebar a.active {
+            background: var(--accent-soft);
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .sidebar a.active i {
+            color: var(--accent);
+        }
+
+        /* ---------------------------------------------------------
+           Main content column
+           --------------------------------------------------------- */
+        .dashboard-main {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            min-width: 0;
+        }
+
+        .card {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--bg);
+            padding: 28px;
+        }
+
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+
+        .card .card-sub {
+            color: var(--ink-soft);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 20px;
+        }
+
+        /* ---- Section 1: Welcome ---- */
+        .welcome-card h1 {
+            font-size: clamp(22px, 3vw, 28px);
+            margin-bottom: 8px;
+        }
+
+        .welcome-card p {
+            color: var(--ink-soft);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 20px;
+        }
+
+        .today-goal {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            background: var(--surface);
+        }
+
+        .today-goal i {
+            font-size: 20px;
+            color: var(--accent);
+        }
+
+        .today-goal .goal-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--ink-faint);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .today-goal .goal-text {
+            font-size: 14.5px;
+            font-family: 'Inter', sans-serif;
+            color: var(--ink);
+        }
+
+        /* ---- Section 2: Learning Profile ---- */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .profile-field .field-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--ink-faint);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .profile-field .field-value {
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: var(--ink);
+        }
+
+        /* ---- Section 3: Preferences badges ---- */
+        .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .badge {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 8px 14px;
+            font-size: 13.5px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            color: var(--ink-soft);
+            background: var(--surface);
+        }
+
+        /* ---- Section 4: Journey timeline ---- */
+        .journey-timeline {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .journey-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            position: relative;
+            padding-bottom: 28px;
+        }
+
+        .journey-step:last-child {
+            padding-bottom: 0;
+        }
+
+        .journey-step::before {
+            content: "";
+            position: absolute;
+            left: 11px;
+            top: 26px;
+            bottom: 0;
+            width: 1px;
+            background: var(--line);
+        }
+
+        .journey-step:last-child::before {
+            display: none;
+        }
+
+        .journey-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid var(--line);
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .journey-dot i {
+            font-size: 13px;
+        }
+
+        .journey-step.done .journey-dot {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .journey-step.done .journey-dot i {
+            color: var(--accent);
+        }
+
+        .journey-step.pending .journey-dot i {
+            color: var(--ink-faint);
+        }
+
+        .journey-text .journey-title {
+            font-size: 14.5px;
+            font-weight: 600;
+            color: var(--ink);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .journey-step.pending .journey-title {
+            color: var(--ink-faint);
+        }
+
+        .journey-text .journey-status {
+            font-size: 12.5px;
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--ink-faint);
+        }
+
+        /* ---- Section 5: Profile completion ---- */
+        .completion-bar-track {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--line);
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        .completion-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        .completion-percent {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            color: var(--ink-faint);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        /* ---- Section 5b: Recommended Resources (shown once the
+           recommendation engine has produced results in Firestore) ---- */
+        .resource-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .resource-card {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 20px;
+            transition: border-color 0.15s ease;
+        }
+
+        .resource-card:hover {
+            border-color: var(--accent);
+        }
+
+        .resource-card.best {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .resource-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .resource-card-head h3 {
+            font-size: 16px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .best-tag {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 3px 8px;
+            flex-shrink: 0;
+        }
+
+        .resource-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .resource-meta span {
+            font-size: 12.5px;
+            font-family: 'Inter', sans-serif;
+            color: var(--ink-soft);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 4px 10px;
+        }
+
+        .resource-card a.resource-link {
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: var(--ink);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .resource-card a.resource-link:hover {
+            color: var(--accent);
+        }
+
+        .confidence-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .confidence-row .confidence-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--ink-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .confidence-row .confidence-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--ink);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* ---- Section 6: What's next CTA ---- */
+        .next-card {
+            background: var(--surface);
+        }
+
+        .next-card h2 {
+            font-size: 20px;
+        }
+
+        .next-card p {
+            color: var(--ink-soft);
+            font-size: 14.5px;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            margin-bottom: 22px;
+            max-width: 560px;
+        }
+
+        .next-card .cta-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* ---- Section 7: Did you know ---- */
+        .info-card {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .info-card i {
+            font-size: 22px;
+            color: var(--accent);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .info-card p {
+            color: var(--ink-soft);
+            font-size: 14.5px;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+        }
+
+        /* ---- Section 8: Account info ---- */
+        .account-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        /* ---- Section 9: Quick actions ---- */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .quick-actions button {
+            width: 100%;
+        }
+
+        /* ---- Future-ready placeholder note (dev-only, subtle) ---- */
+        .future-placeholder {
+            border: 1px dashed var(--line);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            color: var(--ink-faint);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12.5px;
+        }
+
+        /* ---------------------------------------------------------
+           Responsive
+           --------------------------------------------------------- */
+        @media (max-width: 900px) {
+            .dashboard-shell {
+                grid-template-columns: 1fr;
+                padding: 32px 24px 72px;
+            }
+            .sidebar {
+                position: static;
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 6px;
+            }
+            .sidebar a {
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-shell {
+                padding: 24px 16px 64px;
+            }
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+
+        <!-- navbar (shared markup) -->
+        <div class="navbar">
+            <a href="index.html"><img src="images/logo.png" alt="logo"></a>
+            <i class="ri-menu-line" id="hamburgerBtn"></i>
+            <ul class="nav-links" id="navLinks">
+                <h4 id="Home"><a href="index.html">Home</a></h4>
+                <h4 id="features"><a href="pages/feature.html">Features</a></h4>
+                <h4 id="working"><a href="pages/work.html">How it Works</a></h4>
+                <h4 id="why"><a href="pages/why.html">Why SIFT?</a></h4>
+                <button id="lightBtn">🌙</button>
+
+                <span id="loggedOutLinks" style="display:none;">
+                    <a href="signup.html"><button id="signup">Sign Up</button></a>
+                    <a href="login.html"><button id="login">Login</button></a>
+                </span>
+
+                <span id="loggedInLinks">
+                    <span id="userEmailLabel"></span>
+                    <button id="logout">Log Out</button>
+                </span>
+            </ul>
+        </div>
+    </main>
+
+    <div class="dashboard-shell">
+
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <a href="dashboard.html" class="active"><i class="ri-home-4-line"></i> Dashboard</a>
+            <a href="pages/profile.html"><i class="ri-user-line"></i> Profile</a>
+            <a href="pages/questionnaire.html"><i class="ri-survey-line"></i> Questionnaire</a>
+            <a href="pages/settings.html"><i class="ri-settings-3-line"></i> Settings</a>
+        </nav>
+
+        <!-- Main content -->
+        <div class="dashboard-main">
+
+            <!-- Section 1: Welcome -->
+            <section class="card welcome-card">
+                <h1 id="welcomeHeading">👋 Welcome back!</h1>
+                <p>Continue your learning journey with your personalized learning profile.</p>
+                <div class="today-goal">
+                    <i class="ri-flag-line"></i>
+                    <div>
+                        <span class="goal-label">Today's Goal</span>
+                        <span class="goal-text">Keep learning consistently.</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Learning Profile -->
+            <section class="card">
+                <h2>Learning Profile</h2>
+                <p class="card-sub">Based on your questionnaire responses.</p>
+
+                <div class="profile-grid" id="profileGrid">
+                    <div class="profile-field">
+                        <span class="field-label">Skill</span>
+                        <span class="field-value" data-field="skill">—</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="field-label">Experience</span>
+                        <span class="field-value" data-field="experience">—</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="field-label">Goal</span>
+                        <span class="field-value" data-field="goal">—</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="field-label">Learning Style</span>
+                        <span class="field-value" data-field="learningStyle">—</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="field-label">Preferred Language</span>
+                        <span class="field-value" data-field="language">—</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="field-label">Study Time</span>
+                        <span class="field-value" data-field="studyTime">—</span>
+                    </div>
+                </div>
+
+                <a href="pages/questionnaire.html"><button class="btn-secondary"><i class="ri-edit-line"></i> Edit Questionnaire</button></a>
+            </section>
+
+            <!-- Section 3: Learning Preferences badges -->
+            <section class="card">
+                <h2>Learning Preferences</h2>
+                <p class="card-sub">Everything SIFT knows about how you like to learn.</p>
+                <div class="badge-row" id="preferenceBadges">
+                    <!-- populated by dashboard.js -->
+                </div>
+            </section>
+
+            <!-- Section 4: Your Journey -->
+            <section class="card">
+                <h2>Your Journey</h2>
+                <p class="card-sub">Where you are in the SIFT onboarding process.</p>
+
+                <div class="journey-timeline">
+                    <div class="journey-step done">
+                        <div class="journey-dot"><i class="ri-check-line"></i></div>
+                        <div class="journey-text">
+                            <div class="journey-title">Account Created</div>
+                            <div class="journey-status">Complete</div>
+                        </div>
+                    </div>
+                    <div class="journey-step done">
+                        <div class="journey-dot"><i class="ri-check-line"></i></div>
+                        <div class="journey-text">
+                            <div class="journey-title">Questionnaire Completed</div>
+                            <div class="journey-status">Complete</div>
+                        </div>
+                    </div>
+                    <div class="journey-step pending" id="journeyStepRecommend">
+                        <div class="journey-dot"><i class="ri-time-line"></i></div>
+                        <div class="journey-text">
+                            <div class="journey-title">Recommendation Generation</div>
+                            <div class="journey-status" data-status>Coming soon</div>
+                        </div>
+                    </div>
+                    <div class="journey-step pending" id="journeyStepLearning">
+                        <div class="journey-dot"><i class="ri-time-line"></i></div>
+                        <div class="journey-text">
+                            <div class="journey-title">Start Learning</div>
+                            <div class="journey-status" data-status>Coming soon</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4b: Recommended Resources — only rendered once
+                 questionnaire.js has written topResources/confidenceScore
+                 to Firestore. Hidden by default; dashboard.js reveals it. -->
+            <section class="card" id="recommendationsCard" style="display:none;">
+                <h2>Recommended For You</h2>
+                <p class="card-sub">Your top 3 matches based on your learning profile.</p>
+
+                <div class="confidence-row">
+                    <span class="confidence-label">Stop Searching Score</span>
+                    <span class="confidence-value" id="confidenceValue">—</span>
+                </div>
+
+                <div class="resource-list" id="resourceList">
+                    <!-- populated by dashboard.js -->
+                </div>
+            </section>
+
+            <!-- Section 5: Profile Completion -->
+            <section class="card">
+                <h2>Profile Completion</h2>
+                <span class="completion-percent" id="completionPercentLabel">65%</span>
+                <div class="completion-bar-track">
+                    <div class="completion-bar-fill" id="completionBarFill" style="width: 65%;"></div>
+                </div>
+                <p class="card-sub" style="margin-bottom:0;">Your profile is complete. The next step is generating personalized learning recommendations.</p>
+            </section>
+
+            <!-- Section 6: What's Next CTA — copy/button swap between
+                 "not generated yet" and "already generated" states,
+                 controlled by dashboard.js based on Firestore data. -->
+            <section class="card next-card">
+                <h2 id="nextCardHeading">You're Almost Ready!</h2>
+                <p id="nextCardText">We've successfully understood your learning profile. The next step is to analyze your preferences and recommend the learning resources that best match your goals.</p>
+                <div class="cta-buttons">
+                    <button class="btn-primary" id="generateBtn" disabled><i class="ri-hourglass-line"></i> Coming Soon</button>
+                    <a href="pages/questionnaire.html"><button class="btn-secondary">Retake Questionnaire</button></a>
+                </div>
+            </section>
+
+            <!-- Section 7: Did You Know -->
+            <section class="card info-card">
+                <i class="ri-lightbulb-flash-line"></i>
+                <div>
+                    <h2 style="margin-bottom:8px;">Did You Know?</h2>
+                    <p>SIFT doesn't recommend the most popular resources. It recommends the resources that best match <strong>YOUR</strong> learning profile.</p>
+                </div>
+            </section>
+
+            <!-- Section 8: Account Information -->
+            <section class="card">
+                <h2>Account Information</h2>
+                <p class="card-sub">Your account details on file with SIFT.</p>
+                <div class="account-grid">
+                    <div class="profile-field">
+                        <span class="field-label">Name</span>
+                        <span class="field-value" id="accountName">—</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="field-label">Email</span>
+                        <span class="field-value" id="accountEmail">—</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="field-label">Joined On</span>
+                        <span class="field-value" id="accountJoined">—</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="field-label">Questionnaire Status</span>
+                        <span class="field-value" id="accountQuestionnaireStatus">—</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="field-label">Authentication Provider</span>
+                        <span class="field-value" id="accountProvider">—</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 9: Quick Actions -->
+            <section class="card">
+                <h2>Quick Actions</h2>
+                <div class="quick-actions">
+                    <a href="pages/questionnaire.html"><button class="btn-secondary"><i class="ri-edit-line"></i> Edit Questionnaire</button></a>
+                    <a href="pages/profile.html"><button class="btn-secondary"><i class="ri-user-settings-line"></i> Update Profile</button></a>
+                    <a href="pages/settings.html"><button class="btn-secondary"><i class="ri-settings-3-line"></i> Settings</button></a>
+                    <button class="btn-secondary" id="quickLogoutBtn"><i class="ri-logout-box-line"></i> Logout</button>
+                </div>
+            </section>
+
+            <!-- Future-ready space: intentionally empty. Reserved for
+                 Recommendation Confidence, Top 3 Resources, Resource
+                 Comparison, Why This / Why Not, and Progress Tracking
+                 once the recommendation engine ships. Not rendered
+                 as a visible card yet — just documented here so the
+                 next contributor knows where these modules belong. -->
+
+        </div>
+    </div>
+
+    <!-- Footer Start -->
+    <footer class="site-footer">
+        <div class="footer-top">
+            <div class="footer-brand">
+                <h3>Sift</h3>
+                <p>Stop Searching. Start Learning.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Navigate</h4>
+                <a href="index.html">Home</a>
+                <a href="pages/feature.html">Features</a>
+                <a href="pages/work.html">How it Works</a>
+                <a href="pages/why.html">Why SIFT?</a>
+            </div>
+
+            <div class="footer-col">
+                <h4>Account</h4>
+                <a href="signup.html">Sign Up</a>
+                <a href="login.html">Login</a>
+            </div>
+
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <a href="https://github.com/AyMi-2025/NYC_Contest" target="_blank">GitHub</a>
+                <a href="https://www.linkedin.com/feed/update/urn:li:activity:7478760365988933632/" target="_blank">LinkedIn</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Sift. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

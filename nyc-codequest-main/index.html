@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIFT - Stop Searching. Start Learning.</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="script.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link rel="shortcut icon" href="images/logo.png" type="image/x-icon">
+</head>
+
+<body>
+    <main>
+
+      <!-- navbar -->
+      <div class="navbar">
+        <a href="index.html"><img src="images/logo.png" alt="logo"></a>
+        <i class="ri-menu-line" id="hamburgerBtn"></i>
+        <ul class="nav-links" id="navLinks">
+        <h4 id="Home"><a href="index.html">Home</a></h4>
+        <h4 id="whysift"><a href="pages/why.html">Why Sift</a></h4>
+        <h4 id='features'><a href="pages/feature.html">Features</a></h4>
+        <h4 id="working"><a href="pages/work.html">How it Works</a></h4>
+        <button id="lightBtn">🌙</button>
+
+        <!-- logged out wala system-->
+        <span id="loggedOutLinks">
+          <a href="signup.html"><button id="signup">Sign Up</button></a>
+          <a href="login.html"><button id="login">Login</button></a>
+        </span>
+
+
+        <!-- logged in wala system -->
+        <span id="loggedInLinks" style="display:none;">
+          <span id="userEmailLabel"></span>
+          <button id="logout">Log Out</button>
+        </span>
+        </ul>
+      </div>
+    </main>
+
+    <div class="hero">
+      <div class="left-section">
+        <h1>Find The <br> Perfect <span class="hero-highlight">Resources</span></h1>
+        <p>Al-powered Resource guidance that helps you find <br> 
+          the best resources based on your interests, skills, <br> 
+          and academic performance.</p>
+        <a href="signup.html"><button>Start Your Journey <span><i class="ri-arrow-right-line"></i></span></button></a>
+      </div>
+      <div class="hero-image">
+        <img src="images/hero-image.png" alt="pics">
+      </div>
+    </div>
+    
+
+    <!-- <div class="bottom">
+      <a href="webdev.html"><img src="WebDev.png" alt="Web_Dev"></a>
+      <a href="aiml.html"><img src="aiml.png" alt="AI_ML"></a>
+      <a href="dsa.html"><img src="dsa.png" alt="DSA"></a>
+      <a href="cybersecurity.html"><img src="cybersecurity.png" alt="Cyber"></a>
+    </div> -->
+  
+<!-- Footer Start -->
+<footer class="site-footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <h3>Sift</h3>
+      <p>Stop Searching. Start Learning.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <a href="index.html">Home</a>
+      <a href="pages/why.html">Why Sift</a>
+      <a href="pages/feature.html">Features</a>
+      <a href="pages/work.html">How it Works</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Account</h4>
+      <a href="signup.html">Sign Up</a>
+      <a href="login.html">Login</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Connect</h4>
+      <a href="https://github.com/AyMi-2025/NYC_Contest" target="_blank">GitHub</a>
+      <a href="https://www.linkedin.com/feed/update/urn:li:activity:7478760365988933632/" target="_blank">LinkedIn</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2026 Sift. All rights reserved.</p>
+  </div>
+</footer>
+</body>
+</html>
