@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding - SIFT | Stop Searching. Start Learning.</title>
+    <link rel="stylesheet" href="../style.css">
+    <script type="module" src="../script.js" defer></script>
+    <script type="module" src="../js/questionnaire.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link rel="shortcut icon" href="../images/logo.png" type="image/x-icon">
+
+    <!-- Page-specific styles only. Reuses color/spacing/type tokens
+         already defined in style.css. -->
+    <style>
+
+        /* Focused onboarding shell: full navbar reused, but the nav
+           links themselves are hidden here on purpose (only logo +
+           theme toggle remain) so there's nothing pulling the user
+           away mid-questionnaire. */
+        #navLinks .nav-page-link { display: none; }
+        #navLinks #loggedOutLinks,
+        #navLinks #loggedInLinks { display: none; }
+
+        .wizard-shell {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 56px 24px 100px;
+            min-height: calc(100vh - 76px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ---------------------------------------------------------
+           Progress bar
+           --------------------------------------------------------- */
+        .progress-wrap {
+            margin-bottom: 44px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12.5px;
+            color: var(--ink-faint);
+            margin-bottom: 10px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 4px;
+            background: var(--line);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.35s ease;
+        }
+
+        /* ---------------------------------------------------------
+           Question steps
+           --------------------------------------------------------- */
+        .step {
+            display: none;
+            flex-direction: column;
+            gap: 28px;
+            opacity: 0;
+            transform: translateY(6px);
+            animation: stepIn 0.28s ease forwards;
+        }
+
+        .step.active {
+            display: flex;
+        }
+
+        @keyframes stepIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-heading h1 {
+            font-size: clamp(24px, 3.4vw, 30px);
+            line-height: 1.25;
+            margin-bottom: 10px;
+        }
+
+        .step-heading p {
+            color: var(--ink-soft);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .option-card {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--bg);
+            padding: 18px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 14.5px;
+            font-weight: 500;
+            color: var(--ink);
+            transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+            text-align: left;
+        }
+
+        .option-card .emoji {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .option-card:hover {
+            border-color: var(--ink-soft);
+            transform: translateY(-1px);
+        }
+
+        .option-card.selected {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .option-card.selected .check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .option-card .check {
+            margin-left: auto;
+            font-size: 16px;
+            color: var(--accent);
+            opacity: 0;
+            transform: scale(0.6);
+            transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+
+        .step-hint {
+            font-size: 13px;
+            color: var(--ink-faint);
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        /* ---------------------------------------------------------
+           Navigation buttons
+           --------------------------------------------------------- */
+        .wizard-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 44px;
+        }
+
+        .wizard-nav button {
+            border-radius: var(--radius);
+            font-size: 14.5px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            padding: 12px 22px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+        }
+
+        #prevBtn {
+            background: transparent;
+            border: 1px solid var(--line);
+            color: var(--ink-soft);
+        }
+
+        #prevBtn:hover {
+            border-color: var(--ink);
+            color: var(--ink);
+        }
+
+        #prevBtn:disabled {
+            opacity: 0.35;
+            cursor: default;
+        }
+
+        #nextBtn {
+            background: var(--ink);
+            border: 1px solid var(--ink);
+            color: var(--bg);
+        }
+
+        #nextBtn:hover:not(:disabled) {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--accent-ink);
+        }
+
+        #nextBtn:disabled {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        /* ---------------------------------------------------------
+           Completion / loading screen
+           --------------------------------------------------------- */
+        .loading-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 22px;
+            min-height: calc(100vh - 76px);
+            padding: 56px 24px;
+        }
+
+        .loading-screen.active {
+            display: flex;
+        }
+
+        .loading-screen h1 {
+            font-size: clamp(26px, 3.6vw, 32px);
+        }
+
+        .loading-screen > p {
+            color: var(--ink-soft);
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            max-width: 400px;
+        }
+
+        .loading-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 12px;
+            width: 100%;
+            max-width: 340px;
+            text-align: left;
+        }
+
+        .loading-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13.5px;
+            color: var(--ink-faint);
+            opacity: 0.5;
+            transition: opacity 0.2s ease, color 0.2s ease;
+        }
+
+        .loading-step.active {
+            opacity: 1;
+            color: var(--ink-soft);
+        }
+
+        .loading-step.done {
+            opacity: 1;
+            color: var(--ink);
+        }
+
+        .loading-step i {
+            font-size: 15px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .loading-step .ri-loader-4-line {
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .wizard-shell {
+                padding: 40px 18px 80px;
+            }
+            .option-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+
+        <!-- navbar (reused markup — nav links + auth links hidden via CSS
+             above so the flow stays focused; theme toggle stays active) -->
+        <div class="navbar">
+            <a href="../index.html"><img src="../images/logo.png" alt="logo"></a>
+            <i class="ri-menu-line" id="hamburgerBtn" style="visibility:hidden;"></i>
+            <ul class="nav-links" id="navLinks">
+                <h4 class="nav-page-link"><a href="../index.html">Home</a></h4>
+                <button id="lightBtn">🌙</button>
+                <span id="loggedOutLinks"></span>
+                <span id="loggedInLinks" style="display:none;"></span>
+            </ul>
+        </div>
+    </main>
+
+    <!-- Wizard -->
+    <section class="wizard-shell" id="wizardShell">
+
+        <div class="progress-wrap">
+            <div class="progress-label">
+                <span id="stepLabel">Step 1 of 7</span>
+                <span id="stepPercent">14%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <form id="wizardForm">
+
+            <!-- Step 1 -->
+            <div class="step active" data-step="1" data-key="skill" data-max="1">
+                <div class="step-heading">
+                    <h1>What would you like to learn?</h1>
+                    <p>Choose the primary skill you'd like to focus on.</p>
+                </div>
+                <div class="option-grid">
+                    <button type="button" class="option-card" data-value="Web Development"><span class="emoji">🌐</span>Web Development<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="AI / ML"><span class="emoji">🤖</span>AI / ML<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="C++"><span class="emoji">💻</span>C++<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Python"><span class="emoji">🐍</span>Python<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Java"><span class="emoji">☕</span>Java<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Data Science"><span class="emoji">📊</span>Data Science<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Cybersecurity"><span class="emoji">🔐</span>Cybersecurity<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Data Structures & Algorithms"><span class="emoji">🧩</span>Data Structures & Algorithms<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Android Development"><span class="emoji">📱</span>Android Development<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="iOS Development"><span class="emoji">🍎</span>iOS Development<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="UI / UX Design"><span class="emoji">🎨</span>UI / UX Design<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Cloud Computing"><span class="emoji">☁️</span>Cloud Computing<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="DevOps"><span class="emoji">⚙️</span>DevOps<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Data Analytics"><span class="emoji">📈</span>Data Analytics<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Game Development"><span class="emoji">🎮</span>Game Development<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Other"><span class="emoji">➕</span>Other<i class="ri-check-line check"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step" data-step="2" data-key="experience" data-max="1">
+                <div class="step-heading">
+                    <h1>What's your current experience?</h1>
+                </div>
+                <div class="option-grid">
+                    <button type="button" class="option-card" data-value="Beginner"><span class="emoji">🌱</span>Beginner<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Intermediate"><span class="emoji">🚀</span>Intermediate<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Advanced"><span class="emoji">💼</span>Advanced<i class="ri-check-line check"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step" data-step="3" data-key="goal" data-max="1">
+                <div class="step-heading">
+                    <h1>What's your primary goal?</h1>
+                </div>
+                <div class="option-grid">
+                    <button type="button" class="option-card" data-value="Get a Job"><span class="emoji">💼</span>Get a Job<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="College Learning"><span class="emoji">🎓</span>College Learning<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Build Projects"><span class="emoji">🚀</span>Build Projects<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Competitive Programming"><span class="emoji">🏆</span>Competitive Programming<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Freelancing"><span class="emoji">💸</span>Freelancing<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Upskill"><span class="emoji">📚</span>Upskill<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Just Curious"><span class="emoji">❤️</span>Just Curious<i class="ri-check-line check"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step" data-step="4" data-key="learningStyle" data-max="1">
+                <div class="step-heading">
+                    <h1>What's your preferred learning style?</h1>
+                </div>
+                <div class="option-grid">
+                    <button type="button" class="option-card" data-value="Video Courses"><span class="emoji">🎥</span>Video Courses<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Reading Articles"><span class="emoji">📖</span>Reading Articles<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Project Based"><span class="emoji">🛠️</span>Project Based<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Hands-on Practice"><span class="emoji">🧪</span>Hands-on Practice<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Mixed Approach"><span class="emoji">🔄</span>Mixed Approach<i class="ri-check-line check"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="step" data-step="5" data-key="language" data-max="1">
+                <div class="step-heading">
+                    <h1>Which language do you prefer?</h1>
+                </div>
+                <div class="option-grid">
+                    <button type="button" class="option-card" data-value="English"><span class="emoji">🇬🇧</span>English<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Hindi"><span class="emoji">🇮🇳</span>Hindi<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Both"><span class="emoji">🌍</span>Both<i class="ri-check-line check"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="step" data-step="6" data-key="studyTime" data-max="1">
+                <div class="step-heading">
+                    <h1>How much time can you study every day?</h1>
+                </div>
+                <div class="option-grid">
+                    <button type="button" class="option-card" data-value="30 Minutes"><span class="emoji">⏱️</span>30 Minutes<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="1 Hour"><span class="emoji">🕐</span>1 Hour<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="2 Hours"><span class="emoji">🕑</span>2 Hours<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="3+ Hours"><span class="emoji">🕒</span>3+ Hours<i class="ri-check-line check"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 7 -->
+            <div class="step" data-step="7" data-key="preferences" data-max="2">
+                <div class="step-heading">
+                    <h1>What's most important to you in a learning resource?</h1>
+                    <p>Choose up to <strong>two</strong> options.</p>
+                </div>
+                <div class="option-grid">
+                    <button type="button" class="option-card" data-value="Beginner Friendly"><span class="emoji">⭐</span>Beginner Friendly<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Short & Fast"><span class="emoji">⚡</span>Short & Fast<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Project Based"><span class="emoji">🛠️</span>Project Based<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="In-depth"><span class="emoji">📚</span>In-depth<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Industry Relevant"><span class="emoji">💼</span>Industry Relevant<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Interview Focused"><span class="emoji">🎯</span>Interview Focused<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Free Resources"><span class="emoji">🆓</span>Free Resources<i class="ri-check-line check"></i></button>
+                    <button type="button" class="option-card" data-value="Certificate Included"><span class="emoji">📜</span>Certificate Included<i class="ri-check-line check"></i></button>
+                </div>
+                <span class="step-hint" id="multiHint">0 / 2 selected</span>
+            </div>
+
+            <div class="wizard-nav">
+                <button type="button" id="prevBtn" disabled><i class="ri-arrow-left-line"></i> Previous</button>
+                <button type="button" id="nextBtn" disabled>Next <i class="ri-arrow-right-line"></i></button>
+            </div>
+
+        </form>
+    </section>
+
+    <!-- Completion / loading screen -->
+    <section class="loading-screen" id="loadingScreen">
+        <h1>🎉 Perfect!</h1>
+        <p>We're finding the best resources for you.</p>
+        <div class="loading-steps" id="loadingSteps">
+            <div class="loading-step" data-index="0"><i class="ri-checkbox-blank-circle-line"></i> Analyzing your preferences...</div>
+            <div class="loading-step" data-index="1"><i class="ri-checkbox-blank-circle-line"></i> Matching resources...</div>
+            <div class="loading-step" data-index="2"><i class="ri-checkbox-blank-circle-line"></i> Calculating compatibility scores...</div>
+            <div class="loading-step" data-index="3"><i class="ri-checkbox-blank-circle-line"></i> Preparing recommendations...</div>
+        </div>
+    </section>
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Sift</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="script.js" defer></script>
+    <script type="module" src="signup.js" defer></script>
+</head>
+<body class="auth-page">
+    <main>
+      <div class="navbar">
+        <a href="index.html"><img src="images/logo.png" alt="logo"></a>
+        <ul class="nav-links">
+          <button id="lightBtn">☀️</button>
+        </ul>
+      </div>
+
+      <div class="auth-page-wrapper">
+        <div class="auth-card">
+          <h1>Sign Up</h1>
+          <div class="error-msg" id="signupError"></div>
+          <form id="signupForm">
+            <input type="email" id="signupEmail" placeholder="Enter Your Email" required><br>
+            <input type="password" id="signupPassword" placeholder="Create a Password" required minlength="6"><br>
+            <button type="submit" id="signupSubmitBtn">Submit</button>
+          </form>
+          <p class="switch-link">Already have an account? <a href="login.html">Log in</a></p>
+        </div>
+      </div>
+    </main>
+</body>
+</html>

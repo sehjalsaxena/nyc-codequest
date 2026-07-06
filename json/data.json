@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "question": "What do you want to learn?",
+    "options": [
+      "Web Development",
+      "AI/ML",
+      "DSA",
+      "Cybersecurity"
+    ]
+  },
+  {
+    "id": 2,
+    "question": "What is your current level?",
+    "options": [
+      "Beginner (0-1 Month)",
+      "Intermediate (1-3 Months)",
+      "Advanced (3-6 Months)",
+      "Expert (6+ Months)"
+    ]
+  },
+  {
+    "id": 3,
+    "question": "How many hours can you study per week?",
+    "options": [
+      "3-4 hrs",
+      "4-6 hrs",
+      "6-10 hrs",
+      "10+ hrs"
+    ]
+  },
+  {
+    "id": 4,
+    "question": "What is your primary goal?",
+    "options": [
+      "College",
+      "Hobby",
+      "Upskilling",
+      "Job"
+    ]
+  },
+  {
+    "id": 5,
+    "question": "What is your preferred learning style?",
+    "options": [
+      "Video Courses",
+      "Documentation",
+      "Projects",
+      "No Preference "
+    ]
+  }
+]
